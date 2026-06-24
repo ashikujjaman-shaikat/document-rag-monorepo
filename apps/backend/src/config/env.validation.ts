@@ -16,6 +16,26 @@ class EnvironmentVariables {
   @IsInt()
   @Min(1)
   BACKEND_PORT?: number;
+
+  @IsOptional()
+  @IsString()
+  QDRANT_URL?: string;
+
+  @IsOptional()
+  @IsString()
+  QDRANT_COLLECTION?: string;
+
+  @IsOptional()
+  @IsString()
+  OPENAI_API_KEY?: string;
+
+  @IsOptional()
+  @IsString()
+  OPENAI_EMBEDDING_MODEL?: string;
+
+  @IsOptional()
+  @IsString()
+  GROQ_API_KEY?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>): Record<string, unknown> {
