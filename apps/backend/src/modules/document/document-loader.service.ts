@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { extname, join, relative, resolve } from 'node:path';
 
@@ -8,10 +9,13 @@ import { DocumentService } from './document.service';
 
 @Injectable()
 export class DocumentLoaderService {
-  private readonly documentsRoot = resolve(process.cwd(), 'documents');
+  private readonly documentsRoot = this.resolveDocumentsRoot();
   private readonly supportedExtensions = new Set(['.txt', '.md']);
 
-  constructor(private readonly documentService: DocumentService) {}
+  constructor(
+    @Inject(DocumentService)
+    private readonly documentService: DocumentService,
+  ) {}
 
   async loadAllDocuments(): Promise<LoadedDocument[]> {
     const files = await this.scanDocuments(this.documentsRoot);
@@ -44,5 +48,21 @@ export class DocumentLoaderService {
     }
 
     return filePaths;
+  }
+
+  private resolveDocumentsRoot(): string {
+    const candidates = [
+      resolve(process.cwd(), 'documents'),
+      resolve(process.cwd(), '..', 'documents'),
+      resolve(process.cwd(), '..', '..', 'documents'),
+    ];
+
+    for (const candidate of candidates) {
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+    }
+
+    return candidates[0];
   }
 }

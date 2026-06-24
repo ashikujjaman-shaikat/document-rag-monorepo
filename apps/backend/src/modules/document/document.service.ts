@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join, normalize, relative, resolve } from 'node:path';
 
@@ -6,7 +7,7 @@ import type { LoadedDocument } from '@rag/shared' with { 'resolution-mode': 'imp
 
 @Injectable()
 export class DocumentService {
-  private readonly documentsRoot = resolve(process.cwd(), 'documents');
+  private readonly documentsRoot = this.resolveDocumentsRoot();
 
   async readDocument(filename: string): Promise<LoadedDocument> {
     const safeFilename = normalize(filename).replace(/^([/\\])+/, '');
@@ -27,5 +28,21 @@ export class DocumentService {
 
   getDocumentPath(filename: string): string {
     return join(this.documentsRoot, filename);
+  }
+
+  private resolveDocumentsRoot(): string {
+    const candidates = [
+      resolve(process.cwd(), 'documents'),
+      resolve(process.cwd(), '..', 'documents'),
+      resolve(process.cwd(), '..', '..', 'documents'),
+    ];
+
+    for (const candidate of candidates) {
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+    }
+
+    return candidates[0];
   }
 }
