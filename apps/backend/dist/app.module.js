@@ -8,17 +8,28 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const chat_module_1 = require("./chat/chat.module");
-const health_module_1 = require("./health/health.module");
-const prisma_module_1 = require("./prisma/prisma.module");
-const queue_module_1 = require("./queue/queue.module");
-const vector_module_1 = require("./vector/vector.module");
+const config_1 = require("@nestjs/config");
+const env_validation_1 = require("./config/env.validation");
+const health_module_1 = require("./modules/health/health.module");
+const prisma_module_1 = require("./modules/prisma/prisma.module");
+const queue_module_1 = require("./modules/queue/queue.module");
+const vector_module_1 = require("./modules/vector/vector.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, queue_module_1.QueueModule, vector_module_1.VectorModule, health_module_1.HealthModule, chat_module_1.ChatModule],
+        imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: '.env',
+                validate: env_validation_1.validateEnv,
+            }),
+            prisma_module_1.PrismaModule,
+            queue_module_1.QueueModule,
+            vector_module_1.VectorModule,
+            health_module_1.HealthModule,
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

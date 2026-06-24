@@ -6,7 +6,6 @@ export class HealthController {
   getHealth(): Record<string, string> {
     return {
       status: 'ok',
-      mode: 'scaffold-only',
     };
   }
 }

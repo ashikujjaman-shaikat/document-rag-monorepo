@@ -1,1 +1,0 @@
-{"version":3,"file":"vector.service.js","sourceRoot":"","sources":["../../src/vector/vector.service.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAA4C;AAGrC,IAAM,aAAa,GAAnB,MAAM,aAAa;IACxB,MAAM;QACJ,OAAO,gBAAgB,CAAC;IAC1B,CAAC;IAED,cAAc,CAAC,SAAiB,EAAE,KAAK,GAAG,CAAC;QACzC,OAAO,EAAE,CAAC;IACZ,CAAC;CACF,CAAA;AARY,sCAAa;wBAAb,aAAa;IADzB,IAAA,mBAAU,GAAE;GACA,aAAa,CAQzB"}

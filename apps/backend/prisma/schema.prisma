@@ -7,62 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Document {
-  id          String          @id @default(cuid())
-  externalId  String?         @unique
-  title       String
-  sourceUrl   String?
-  status      DocumentStatus  @default(PENDING)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  chunks      DocumentChunk[]
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  createdAt     DateTime       @default(now())
+  conversations Conversation[]
 }
 
-model DocumentChunk {
-  id          String    @id @default(cuid())
-  documentId  String
-  chunkIndex  Int
-  content     String    @db.Text
-  pointId     String?   @unique
-  metadata    Json?
-  createdAt   DateTime  @default(now())
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
 
-  document    Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, chunkIndex])
-  @@index([documentId])
+  @@index([userId])
 }
 
-model ChatSession {
-  id          String        @id @default(cuid())
-  userKey     String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  messages    ChatMessage[]
-}
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  role           MessageRole
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-model ChatMessage {
-  id          String          @id @default(cuid())
-  sessionId   String
-  role        MessageRole
-  content     String          @db.Text
-  latencyMs   Int?
-  createdAt   DateTime        @default(now())
-
-  session     ChatSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId, createdAt])
-}
-
-enum DocumentStatus {
-  PENDING
-  PROCESSING
-  READY
-  FAILED
+  @@index([conversationId, createdAt])
 }
 
 enum MessageRole {
   USER
   ASSISTANT
-  SYSTEM
 }
