@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id          String          @id @default(cuid())
+  externalId  String?         @unique
+  title       String
+  sourceUrl   String?
+  status      DocumentStatus  @default(PENDING)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  chunks      DocumentChunk[]
+}
+
+model DocumentChunk {
+  id          String    @id @default(cuid())
+  documentId  String
+  chunkIndex  Int
+  content     String    @db.Text
+  pointId     String?   @unique
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+
+  document    Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, chunkIndex])
+  @@index([documentId])
+}
+
+model ChatSession {
+  id          String        @id @default(cuid())
+  userKey     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  messages    ChatMessage[]
+}
+
+model ChatMessage {
+  id          String          @id @default(cuid())
+  sessionId   String
+  role        MessageRole
+  content     String          @db.Text
+  latencyMs   Int?
+  createdAt   DateTime        @default(now())
+
+  session     ChatSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
